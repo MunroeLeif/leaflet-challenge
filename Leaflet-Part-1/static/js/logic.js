@@ -10,20 +10,29 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // Load the data (Signifigant Earthquakes over the last 30 days)
-let JSONdata = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
+//let JSONdata = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
+let JsonData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 
 function colorMarker(colordepth) {
-  if (colordepth < 10) {
+  if (colordepth <= 40) {
     return "#800080"
   }
-  else if (colordepth < 20){
+  else if (colordepth < 80){
     return "#008000"
   }
-  
+  else if (colordepth < 120){
+    return "orange"
+  }
+  else if (colordepth < 160){
+    return "blue"
+  }
+  else {
+    return "yellow"
+  }
 }
 
 //Read in the data with d3
-d3.json(JSONdata).then(function (data) {
+d3.json(JsonData).then(function (data) {
 
   console.log(data);
   features = data.features;
@@ -51,8 +60,10 @@ d3.json(JSONdata).then(function (data) {
       L.circleMarker([location.coordinates[1], location.coordinates[0]], {
         radius: radius,
         color: colorMarker(colordepth),
+        opacity: 0.95
       })
-        .bindPopup(features[i].properties.title)
+        .bindTooltip(`Magnitude: ${radius}  Location:${location.coordinates[1].toFixed(2)}, ${location.coordinates[0].toFixed(2)}  Depth:${colordepth}`).openTooltip()
+        //.bindPopup(features[i].properties.title)
         .addTo(myMap);
     }
   }
